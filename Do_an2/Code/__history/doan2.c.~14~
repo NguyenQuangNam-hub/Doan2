@@ -1,0 +1,82 @@
+#include <doan2.h>
+#include <16f877a.h>
+#fuses nowdt, put, hs, noprotect, nolvp
+#use delay(clock=20m)
+#define LCD_ENABLE_PIN  PIN_E0
+#define LCD_RS_PIN      PIN_E1
+#define LCD_RW_PIN      PIN_E2
+#define LCD_DATA4       PIN_D4
+#define LCD_DATA5       PIN_D5
+#define LCD_DATA6       PIN_D6
+#define LCD_DATA7       PIN_D7
+#include <lcd.c>     //thu vien lcd
+#include <DHT11.h>   //thu vien dht11
+unsigned int8 nhiet,nhiet2,doam,doam2;    //khai bao bien
+   unsigned int8 str[20];
+int dem=35;
+void sosanh()
+{
+    if(nhiet<=35)
+    {
+    output_high(pin_d0);
+    output_low(pin_d1);
+    output_low(pin_b1);
+    }
+    else{
+    output_low(pin_d0);
+    output_high(pin_d1);}
+    output_low(pin_b1);
+    if(nhiet>45)
+    {
+    output_high(pin_b1);
+    output_low(pin_d1);
+    output_low(pin_d0);
+    }
+}  
+          
+void main()
+{
+   lcd_init();
+   lcd_gotoxy(1,1);
+   lcd_putc("READING...");
+   delay_ms(500);
+   lcd_putc('\f');
+   while(true){
+      if(DHT_GetTemHumi(nhiet,nhiet2,doam,doam2)){        //hien thi do am
+         sprintf(str,"On:%u ",dem);
+         lcd_gotoxy(1,1);
+         printf(lcd_putc,"%s",str);
+         sprintf(str,"Do Am:%u",doam);
+         lcd_gotoxy(8,1);
+         printf(lcd_putc,"%s",str);
+         lcd_putc("%");
+         sprintf(str,"Nhiet Do:%u.%u",nhiet,nhiet2);             //hien thi nhiet do
+         lcd_gotoxy(1,2);
+         printf(lcd_putc,"%s",str);
+         lcd_putc(223);
+         lcd_putc("C");
+      }
+      sosanh();
+      if (input(pin_d2)==0){              //nut START/STOP
+         delay_ms(10);
+         if (input(pin_d2)==0)
+         while(input(pin_d2)==0){
+         }
+         nhiet=nhiet+1;
+         }         
+       if (input(pin_d3)==0){              //nut START/STOP
+         delay_ms(10);
+         if (input(pin_d3)==0)
+         while(input(pin_d3)==0){
+         }
+         nhiet=nhiet-1;
+         }
+        }
+     }
+}
+     
+      
+      
+      
+  
+
